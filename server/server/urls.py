@@ -16,11 +16,13 @@ Including another URLconf
 """
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.messages import api
 from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("", include("frontend.urls"))
+    path("", include("frontend.urls")),
+    path("api/", include("catalog.urls")),
 ]
 
 if settings.DEBUG:
