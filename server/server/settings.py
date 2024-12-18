@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'frontend',
     'debug_toolbar',
     'rest_framework',
-    'core',
     'catalog',
 ]
 
