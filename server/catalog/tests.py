@@ -17,6 +17,7 @@ class TestCategoriesApiView(TestCase):
     """
     Тестирование GET /api/categories/
     """
+
     def setUp(self):
         category_image = CategoryImage.objects.create(
             src="path/to/image.jpg", alt="Category Image"
@@ -36,9 +37,11 @@ class TestCategoriesApiView(TestCase):
         """
         Проверка на успешное получение категорий.
         """
-        response = self.client.get('/api/categories/')
+        response = self.client.get("/api/categories/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        expected_data = CategorySerializer([self.category_1, self.category_2, self.category_3], many=True).data
+        expected_data = CategorySerializer(
+            [self.category_1, self.category_2, self.category_3], many=True
+        ).data
         self.assertEqual(response.data, expected_data)
 
     def test_no_categories(self):
@@ -46,12 +49,15 @@ class TestCategoriesApiView(TestCase):
         Проверка на получение пустого списка, при отсутствии категорий.
         """
         Category.objects.all().delete()
-        response = self.client.get('/api/categories/')
+        response = self.client.get("/api/categories/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, [])
 
 
 class TestCatalogListAPIView(TestCase):
+    """
+    Тестирование GET /api/catalog/
+    """
     def setUp(self):
         self.category_image = CategoryImage.objects.create(
             src="path/to/image.jpg", alt="Category Image"
@@ -110,150 +116,156 @@ class TestCatalogListAPIView(TestCase):
         """
         Тестирование на получение всех продуктов.
         """
-        url = reverse('catalog')
+        url = reverse("catalog")
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn('items', response.data)
-        self.assertIn('currentPage', response.data)
-        self.assertIn('lastPage', response.data)
+        self.assertIn("items", response.data)
+        self.assertIn("currentPage", response.data)
+        self.assertIn("lastPage", response.data)
 
     def test_filter_by_name(self):
         """
         Тестирование фильтра по имени.
         """
-        url = reverse('catalog')
-        response = self.client.get(url, {'name': "Product 1"})
+        url = reverse("catalog")
+        response = self.client.get(url, {"name": "Product 1"})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['items']), 1)
-        self.assertEqual(response.data['items'][0]['title'], "Product 1")
+        self.assertEqual(len(response.data["items"]), 1)
+        self.assertEqual(response.data["items"][0]["title"], "Product 1")
 
     def test_filter_by_min_price(self):
         """
         Тестирование фильтра минимальной цены.
         """
-        url = reverse('catalog')
-        response = self.client.get(url, {'minPrice': 150})
+        url = reverse("catalog")
+        response = self.client.get(url, {"minPrice": 150})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['items']), 2)
+        self.assertEqual(len(response.data["items"]), 2)
 
     def test_filter_by_max_price(self):
         """
         Тестирование фильтра максимальной цены.
         """
-        url = reverse('catalog')
-        response = self.client.get(url, {'maxPrice': 150})
+        url = reverse("catalog")
+        response = self.client.get(url, {"maxPrice": 150})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['items']), 2)
+        self.assertEqual(len(response.data["items"]), 2)
 
     def test_filter_by_free_delivery(self):
         """
         Проверка фильтра бесплатной доставки.
         """
-        url = reverse('catalog')
-        response = self.client.get(url, {'freeDelivery': True})
+        url = reverse("catalog")
+        response = self.client.get(url, {"freeDelivery": True})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['items']), 2)
+        self.assertEqual(len(response.data["items"]), 2)
 
     def test_filter_by_available(self):
         """
         Проверка фильтра доступных товаров.
         """
-        url = reverse('catalog')
-        response = self.client.get(url, {'available': True})
+        url = reverse("catalog")
+        response = self.client.get(url, {"available": True})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['items']), 2)
+        self.assertEqual(len(response.data["items"]), 2)
 
     def test_pagination(self):
         """
         Тестирование пагинации и лимита.
         """
-        url = reverse('catalog')
-        response = self.client.get(url, {'currentPage': 1, 'limit': 2})
+        url = reverse("catalog")
+        response = self.client.get(url, {"currentPage": 1, "limit": 2})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['items']), 2)
-        self.assertEqual(response.data['currentPage'], 1)
-        self.assertEqual(response.data['lastPage'], 2)
+        self.assertEqual(len(response.data["items"]), 2)
+        self.assertEqual(response.data["currentPage"], 1)
+        self.assertEqual(response.data["lastPage"], 2)
 
     def test_sort_by_price_dec(self):
         """
         Тестирование сортировки по цене по возрастанию.
         """
-        url = reverse('catalog')
-        response = self.client.get(url, {'sort': 'price', 'sortType': 'dec'})
+        url = reverse("catalog")
+        response = self.client.get(url, {"sort": "price", "sortType": "dec"})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        prices = [item['price'] for item in response.data['items']]
+        prices = [item["price"] for item in response.data["items"]]
         self.assertEqual(prices, sorted(prices, reverse=True))
 
     def test_sort_by_price_inc(self):
         """
         Тестирование сортировки по цене по убыванию.
         """
-        url = reverse('catalog')
-        response = self.client.get(url, {'sort': 'price', 'sortType': 'inc'})
+        url = reverse("catalog")
+        response = self.client.get(url, {"sort": "price", "sortType": "inc"})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        prices = [item['price'] for item in response.data['items']]
+        prices = [item["price"] for item in response.data["items"]]
         self.assertEqual(prices, sorted(prices))
 
     def test_filter_by_tags(self):
         """
         Тестирование фильтрации по тегам.
         """
-        url = reverse('catalog')
-        response = self.client.get(url, {'tags': ['laptop']})
+        url = reverse("catalog")
+        response = self.client.get(url, {"tags": ["laptop"]})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        for item in response.data['items']:
-            self.assertIn('laptop', [tag['name'] for tag in item['tags']])
+        for item in response.data["items"]:
+            self.assertIn("laptop", [tag["name"] for tag in item["tags"]])
 
     def test_combined_filters(self):
         """
         Тестирование со всеми параметрами.
         """
-        url = reverse('catalog')
-        response = self.client.get(url, {
-            'name': 'Product 1',
-            'minPrice': 100,
-            'maxPrice': 200,
-            'freeDelivery': True,
-            'available': True,
-            'sort': 'price',
-            'sortType': 'dec',
-            'tags': ['smartphone']
-        })
+        url = reverse("catalog")
+        response = self.client.get(
+            url,
+            {
+                "name": "Product 1",
+                "minPrice": 100,
+                "maxPrice": 200,
+                "freeDelivery": True,
+                "available": True,
+                "sort": "price",
+                "sortType": "dec",
+                "tags": ["smartphone"],
+            },
+        )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['items']), 1)
-        self.assertEqual(response.data['items'][0]['title'], 'Product 1')
+        self.assertEqual(len(response.data["items"]), 1)
+        self.assertEqual(response.data["items"][0]["title"], "Product 1")
 
     def test_empty_response(self):
         """
         Тестирование пустого ответа
         """
-        url = reverse('catalog')
-        response = self.client.get(url, {'name': 'Nonexistent Product'})
+        url = reverse("catalog")
+        response = self.client.get(url, {"name": "Nonexistent Product"})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['items']), 0)
+        self.assertEqual(len(response.data["items"]), 0)
 
     def test_invalid_page(self):
         """
         Тестирование некорректного значения в параметрах пагинации.
         """
-        url = reverse('catalog')
-        response = self.client.get(url, {'currentPage': -1, 'limit': 2})
+        url = reverse("catalog")
+        response = self.client.get(url, {"currentPage": -1, "limit": 2})
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class ProductPopularAPIViewTest(TestCase):
+    """
+    Тестирование GET /api/products/popular/
+    """
     def setUp(self):
         self.url = reverse("product-popular")
 
@@ -312,7 +324,7 @@ class ProductPopularAPIViewTest(TestCase):
         self.product2.tags.add(self.tag2)
         self.product3.tags.add(self.tag1, self.tag2)
 
-        self.user = User.objects.create_user(username='testuser', password='password')
+        self.user = User.objects.create_user(username="testuser", password="password")
 
         for i in range(5):
             Review.objects.create(
@@ -321,7 +333,7 @@ class ProductPopularAPIViewTest(TestCase):
                 text=f"Review {i} for product 1",
                 rate=4,
                 date="2024-12-19T12:00:00Z",
-                product=self.product1
+                product=self.product1,
             )
 
         for i in range(3):
@@ -331,7 +343,7 @@ class ProductPopularAPIViewTest(TestCase):
                 text="Excellent product",
                 rate=5,
                 date="2024-12-19T12:00:00Z",
-                product=self.product2
+                product=self.product2,
             )
 
     def test_get_popular_product(self):
@@ -341,14 +353,20 @@ class ProductPopularAPIViewTest(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # Проверяем, что возвращается правильный продукт
-        popular_product = Product.objects.annotate(reviews_count=Count("reviews")).order_by("-reviews_count").first()
+        popular_product = (
+            Product.objects.annotate(reviews_count=Count("reviews"))
+            .order_by("-reviews_count")
+            .first()
+        )
         serialized_data = ProductShortSerializers(popular_product).data
 
         self.assertEqual(response.data, serialized_data)
 
 
 class ProductLimitedAPIViewTest(TestCase):
+    """
+    Тестирование GET /api/products/limited/
+    """
     def setUp(self):
         self.category_image = CategoryImage.objects.create(
             src="path/to/image.jpg", alt="Category Image"
@@ -435,7 +453,7 @@ class ProductLimitedAPIViewTest(TestCase):
     def test_get_empty_list(self):
         """
         Проверка на получение пустого списка,
-        при отсуствии лимитированных товаров.
+        при отсутствии лимитированных товаров.
         """
         Product.objects.filter(count__lt=10).delete()
 

@@ -11,8 +11,9 @@ class CatalogFilter(django_filters.FilterSet):
         field_name="free_delivery", lookup_expr="exact"
     )
     available = django_filters.BooleanFilter(method="filter_available")
-    tags = django_filters.ModelMultipleChoiceFilter(queryset=Tag.objects.all(), field_name="tags__name",
-                                                    to_field_name="name")
+    tags = django_filters.ModelMultipleChoiceFilter(
+        queryset=Tag.objects.all(), field_name="tags__name", to_field_name="name"
+    )
 
     def filter_available(self, queryset, name, value):
         if value:

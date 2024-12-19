@@ -45,8 +45,6 @@ class ProductShortSerializers(serializers.ModelSerializer):
         return representation
 
 
-
-
 class SaleSerializers(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
     price = serializers.SerializerMethodField()
