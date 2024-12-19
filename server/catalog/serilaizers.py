@@ -1,28 +1,37 @@
+from typing import List, Dict
+
 from rest_framework import serializers
-from .models import Product, Category, Tag
+
+from catalog.models import CategoryImage, Category
 
 
-class TagSerializer(serializers.ModelSerializer):
+class ImageCategorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = Tag
-        fields = ['id', 'name']
-
-
-class ProductSerializer(serializers.ModelSerializer):
-    tags = TagSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Product
-        fields = ['id', 'title', 'price', 'count', 'rating', 'free_delivery', 'image', 'tags', 'created_at']
+        model = CategoryImage
+        fields = ["src", "alt"]
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    subcategories = serializers.SerializerMethodField()
-    products = ProductSerializer(many=True, read_only=True)
+    subcategories = serializers.SerializerMethodField(
+        method_name="getter_subcategories"
+    )
+    image = serializers.SerializerMethodField(method_name="getter_images")
 
     class Meta:
         model = Category
-        fields = ['id', 'title', 'image', 'subcategories', 'products']
+        fields = ["id", "title", "image", "subcategories"]
 
-    def get_subcategories(self, obj):
-        return CategorySerializer(obj.subcategories.all(), many=True).data
+    def getter_images(self, obj):
+        return ImageCategorySerializer(obj.image).data
+
+    def getter_subcategories(self, obj: Category) -> List[Dict]:
+        data = [
+            {
+                "id": obj.id,
+                "title": obj.title,
+                "image": ImageCategorySerializer(obj.image).data,
+            }
+            for obj in obj.subcategories.all()
+        ]
+
+        return data
