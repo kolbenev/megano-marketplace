@@ -6,7 +6,7 @@ from django.db.models import Count, Avg
 from product.models import Product, Sale
 from product.serilaizers import ProductShortSerializers, SaleSerializers
 from catalog.filters import CatalogFilter
-from catalog.pagination import CustomPagination
+from catalog.pagination import CustomPagination, SalePagination
 from catalog.models import Category
 from catalog.serilaizers import CategorySerializer
 
@@ -15,6 +15,7 @@ class CategoriesApiView(ListAPIView):
     """
     Эндпоинт для вывода всех Категорий.
     """
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
@@ -25,6 +26,7 @@ class CatalogListAPIView(ListAPIView):
     информацией о количестве отзывов и среднем рейтинге каждого
     продукта. Поддерживает пагинацию, фильтрацию и сортировку.
     """
+
     queryset = Product.objects.annotate(
         reviews_count=Count("reviews"), rating=Avg("reviews__rate")
     )
@@ -55,6 +57,7 @@ class ProductLimitedAPIView(ListAPIView):
     """
     Эндпоинт для вывода товаров с остатком менее 10.
     """
+
     serializer_class = ProductShortSerializers
 
     def get_queryset(self):
@@ -65,14 +68,18 @@ class SalesListAPIView(ListAPIView):
     """
     Эндпоинт для вывода всех товаров со скидкой.
     """
+
     queryset = Sale.objects.all()
     serializer_class = SaleSerializers
-    pagination_class = CustomPagination
+    pagination_class = SalePagination
 
 
 class BannersListAPIView(ListAPIView):
     """
     Эндпоинт для вывода предметов баннера.
     """
-    queryset = Product.objects.all()
+
+    queryset = Product.objects.annotate(
+        reviews_count=Count("reviews"), rating=Avg("reviews__rate")
+    )
     serializer_class = ProductShortSerializers

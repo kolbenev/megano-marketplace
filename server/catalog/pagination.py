@@ -3,6 +3,21 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 
 
+class SalePagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 100
+
+    def get_paginated_response(self, data):
+        return Response(
+            {
+                "items": data,
+                "currentPage": self.page.number,
+                "lastPage": self.page.paginator.num_pages,
+            }
+        )
+
+
 class CustomPagination(PageNumberPagination):
     page_size = 20
     page_query_param = "currentPage"

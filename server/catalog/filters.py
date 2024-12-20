@@ -8,7 +8,7 @@ class CatalogFilter(django_filters.FilterSet):
     minPrice = django_filters.NumberFilter(field_name="price", lookup_expr="gte")
     maxPrice = django_filters.NumberFilter(field_name="price", lookup_expr="lte")
     freeDelivery = django_filters.BooleanFilter(
-        field_name="free_delivery", lookup_expr="exact"
+        field_name="freeDelivery", lookup_expr="exact"
     )
     available = django_filters.BooleanFilter(method="filter_available")
     tags = django_filters.ModelMultipleChoiceFilter(

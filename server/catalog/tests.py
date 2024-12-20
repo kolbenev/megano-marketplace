@@ -1,16 +1,16 @@
 from django.contrib.auth.models import User
+from django.core.files.base import ContentFile
 from django.db.models import Count
 from django.test import TestCase
+from django.urls import reverse
 from rest_framework.test import APIClient
+from rest_framework import status
+
+from product.models import Product, ProductImage, Review, Sale
+from product.serilaizers import ProductShortSerializers
+from core.models import Tag
 from catalog.models import Category, CategoryImage
 from catalog.serilaizers import CategorySerializer
-from core.models import Tag
-from product.models import Product, ProductImage, Review
-
-from rest_framework import status
-from django.urls import reverse
-
-from product.serilaizers import ProductShortSerializers
 
 
 class TestCategoriesApiView(TestCase):
@@ -58,6 +58,7 @@ class TestCatalogListAPIView(TestCase):
     """
     Тестирование GET /api/catalog/
     """
+
     def setUp(self):
         self.category_image = CategoryImage.objects.create(
             src="path/to/image.jpg", alt="Category Image"
@@ -84,7 +85,7 @@ class TestCatalogListAPIView(TestCase):
             price=100,
             count=10,
             category=self.category,
-            free_delivery=True,
+            freeDelivery=True,
         )
         self.product1.images.add(self.image1, self.image2)
 
@@ -94,7 +95,7 @@ class TestCatalogListAPIView(TestCase):
             price=200,
             count=5,
             category=self.category,
-            free_delivery=False,
+            freeDelivery=False,
         )
         self.product2.images.add(self.image2, self.image3)
 
@@ -104,7 +105,7 @@ class TestCatalogListAPIView(TestCase):
             price=150,
             count=0,
             category=self.category,
-            free_delivery=True,
+            freeDelivery=True,
         )
         self.product3.images.add(self.image1, self.image3)
 
@@ -188,7 +189,7 @@ class TestCatalogListAPIView(TestCase):
 
     def test_sort_by_price_dec(self):
         """
-        Тестирование сортировки по цене по возрастанию.
+        Тестирование сортировки цны по возрастанию.
         """
         url = reverse("catalog")
         response = self.client.get(url, {"sort": "price", "sortType": "dec"})
@@ -199,7 +200,7 @@ class TestCatalogListAPIView(TestCase):
 
     def test_sort_by_price_inc(self):
         """
-        Тестирование сортировки по цене по убыванию.
+        Тестирование сортировки по убыванию цены.
         """
         url = reverse("catalog")
         response = self.client.get(url, {"sort": "price", "sortType": "inc"})
@@ -266,6 +267,7 @@ class ProductPopularAPIViewTest(TestCase):
     """
     Тестирование GET /api/products/popular/
     """
+
     def setUp(self):
         self.url = reverse("product-popular")
 
@@ -296,7 +298,7 @@ class ProductPopularAPIViewTest(TestCase):
             price=100,
             count=10,
             category=self.category,
-            free_delivery=True,
+            freeDelivery=True,
         )
         self.product1.images.add(self.image1, self.image2)
 
@@ -306,7 +308,7 @@ class ProductPopularAPIViewTest(TestCase):
             price=200,
             count=5,
             category=self.category,
-            free_delivery=False,
+            freeDelivery=False,
         )
         self.product2.images.add(self.image2, self.image3)
 
@@ -316,7 +318,7 @@ class ProductPopularAPIViewTest(TestCase):
             price=150,
             count=0,
             category=self.category,
-            free_delivery=True,
+            freeDelivery=True,
         )
         self.product3.images.add(self.image1, self.image3)
 
@@ -367,6 +369,7 @@ class ProductLimitedAPIViewTest(TestCase):
     """
     Тестирование GET /api/products/limited/
     """
+
     def setUp(self):
         self.category_image = CategoryImage.objects.create(
             src="path/to/image.jpg", alt="Category Image"
@@ -393,7 +396,7 @@ class ProductLimitedAPIViewTest(TestCase):
             price=100,
             count=100,
             category=self.category,
-            free_delivery=True,
+            freeDelivery=True,
         )
         self.product1.images.add(self.image1, self.image2)
 
@@ -403,7 +406,7 @@ class ProductLimitedAPIViewTest(TestCase):
             price=200,
             count=500,
             category=self.category,
-            free_delivery=False,
+            freeDelivery=False,
         )
         self.product2.images.add(self.image2, self.image3)
 
@@ -413,7 +416,7 @@ class ProductLimitedAPIViewTest(TestCase):
             price=150,
             count=5,
             category=self.category,
-            free_delivery=True,
+            freeDelivery=True,
         )
         self.product3.images.add(self.image1, self.image3)
 
@@ -462,3 +465,194 @@ class ProductLimitedAPIViewTest(TestCase):
 
         data = response.json()
         self.assertEqual(len(data), 0)
+
+
+class TestSalesListAPIView(TestCase):
+    """
+    Тестирование GET /api/sales
+    """
+
+    def setUp(self):
+        self.url = reverse("sales")
+
+        category_image_content = ContentFile(
+            b"fake_image_content", "category_image.jpg"
+        )
+        self.category_image = CategoryImage.objects.create(
+            src=category_image_content, alt="Category Image"
+        )
+        self.category = Category.objects.create(
+            title="Electronics", image=self.category_image
+        )
+
+        product_image1_content = ContentFile(
+            b"fake_image_content", "product_image1.jpg"
+        )
+        product_image2_content = ContentFile(
+            b"fake_image_content", "product_image2.jpg"
+        )
+        self.image1 = ProductImage.objects.create(
+            src=product_image1_content, alt="Image 1"
+        )
+        self.image2 = ProductImage.objects.create(
+            src=product_image2_content, alt="Image 2"
+        )
+
+        self.product = Product.objects.create(
+            title="Product 1",
+            description="Description for product 1",
+            price=100,
+            count=100,
+            category=self.category,
+            freeDelivery=True,
+        )
+        self.product.images.add(self.image1, self.image2)
+
+        self.sale1 = Sale.objects.create(
+            product=self.product,
+            salePrice=80.00,
+            dateFrom="2024-12-01T00:00:00Z",
+            dateTo="2024-12-31T23:59:59Z",
+            title="Holiday Sale",
+        )
+        self.sale2 = Sale.objects.create(
+            product=self.product,
+            salePrice=75.00,
+            dateFrom="2024-11-01T00:00:00Z",
+            dateTo="2024-11-30T23:59:59Z",
+            title="Black Friday",
+        )
+
+    def tearDown(self):
+        self.image1.src.delete(save=False)
+        self.image2.src.delete(save=False)
+        self.category_image.src.delete(save=False)
+
+    def test_sales_list(self):
+        """
+        Тестирование успешного возвращение списка.
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("items", response.data)
+        self.assertEqual(len(response.data["items"]), 2)
+
+    def test_sales_list_contains_correct_fields(self):
+        """
+        Тестирование полей.
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        sale_item = response.data["items"][0]
+        self.assertIn("id", sale_item)
+        self.assertIn("price", sale_item)
+        self.assertIn("salePrice", sale_item)
+        self.assertIn("dateFrom", sale_item)
+        self.assertIn("dateTo", sale_item)
+        self.assertIn("title", sale_item)
+        self.assertIn("images", sale_item)
+
+    def test_sales_list_pagination(self):
+        """
+        Тестирование пагинации.
+        """
+        response = self.client.get(f"{self.url}?currentPage=1")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["currentPage"], 1)
+
+    def test_sales_list_returns_empty_if_no_sales(self):
+        """
+        Тестируем возвращение пустого списка.
+        """
+        Sale.objects.all().delete()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["items"]), 0)
+
+
+class TestBannersListAPIView(TestCase):
+    """
+    Тестирование GET /api/banners/
+    """
+
+    def setUp(self):
+        self.url = reverse("banners")
+
+        category_image_content = ContentFile(
+            b"fake_image_content", "category_image.jpg"
+        )
+        self.category_image = CategoryImage.objects.create(
+            src=category_image_content, alt="Category Image"
+        )
+        self.category = Category.objects.create(
+            title="Electronics", image=self.category_image
+        )
+
+        product_image1_content = ContentFile(
+            b"fake_image_content", "product_image1.jpg"
+        )
+        product_image2_content = ContentFile(
+            b"fake_image_content", "product_image2.jpg"
+        )
+        self.image1 = ProductImage.objects.create(
+            src=product_image1_content, alt="Image 1"
+        )
+        self.image2 = ProductImage.objects.create(
+            src=product_image2_content, alt="Image 2"
+        )
+
+        self.product1 = Product.objects.create(
+            title="Product 1",
+            description="Description for product 1",
+            price=100,
+            count=100,
+            category=self.category,
+            freeDelivery=True,
+        )
+        self.product2 = Product.objects.create(
+            title="Product 2",
+            description="Description for product 2",
+            price=100,
+            count=100,
+            category=self.category,
+            freeDelivery=True,
+        )
+
+        self.product1.images.add(self.image1, self.image2)
+        self.product2.images.add(self.image1, self.image2)
+
+    def tearDown(self):
+        self.image1.src.delete(save=False)
+        self.image2.src.delete(save=False)
+        self.category_image.src.delete(save=False)
+
+    def test_banners_list_success(self):
+        """
+        Тестируем успешный запрос для вывода списка баннеров.
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        product_data = response.data[0]
+        self.assertIn("id", product_data)
+        self.assertIn("category", product_data)
+        self.assertIn("price", product_data)
+        self.assertIn("count", product_data)
+        self.assertIn("title", product_data)
+        self.assertIn("description", product_data)
+        self.assertIn("freeDelivery", product_data)
+        self.assertIn("images", product_data)
+        self.assertIn("tags", product_data)
+        self.assertIn("reviews", product_data)
+        self.assertIn("rating", product_data)
+
+    def test_empty_banners_list(self):
+        """
+        Тестируем случай, когда нет продуктов, которые могут быть отображены.
+        """
+        Product.objects.all().delete()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, [])

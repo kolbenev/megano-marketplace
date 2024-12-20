@@ -3,7 +3,7 @@ from django.db import models
 
 
 class CategoryImage(models.Model):
-    src = models.ImageField(upload_to="categories/images/")
+    src = models.ImageField(upload_to="media/images/categories/")
     alt = models.CharField(max_length=100)
 
 

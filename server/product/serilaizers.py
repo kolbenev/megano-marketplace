@@ -25,7 +25,7 @@ class ProductShortSerializers(serializers.ModelSerializer):
             "date",
             "title",
             "description",
-            "free_delivery",
+            "freeDelivery",
             "images",
             "tags",
             "reviews",
@@ -54,9 +54,9 @@ class SaleSerializers(serializers.ModelSerializer):
         fields = [
             "id",
             "price",
-            "sale_price",
-            "date_from",
-            "date_to",
+            "salePrice",
+            "dateFrom",
+            "dateTo",
             "title",
             "images",
         ]
