@@ -1,3 +1,39 @@
-from django.shortcuts import render
+from django.db.models import Avg
+from rest_framework import status
+from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-# Create your views here.
+from product.models import Product
+from product.serializers import ProductFullSerializers, ReviewSerializer
+
+
+class ProductDetailsAPIView(APIView):
+    """
+    Получение полной информации о продукте.
+    """
+
+    def get(self, request: Request, id: int) -> Response:
+        product = get_object_or_404(
+            Product.objects.annotate(rating=Avg("reviews__rate")), id=id
+        )
+        serializer = ProductFullSerializers(product)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ProductReviewAPIVIew(APIView):
+    """
+    Не рабочий.
+    """
+
+    def post(self, request: Request, id: int) -> Response:
+        permission_classes = (IsAuthenticated,)
+        product = get_object_or_404(Product, id=id)
+        request_serializer = ReviewSerializer(data=request.data)
+        if request_serializer.is_valid():
+            request_serializer.save()
+            product.reviews.add(request_serializer)
+            return Response(request_serializer.data, status.HTTP_200_OK)
+        return Response(request_serializer.errors, status.HTTP_400_BAD_REQUEST)

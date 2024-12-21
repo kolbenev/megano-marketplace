@@ -6131,7 +6131,7 @@ var Vue = (function (exports) {
   const isSVGContainer = (container) => /svg/.test(container.namespaceURI) && container.tagName !== 'foreignObject';
   const isComment = (node) => node.nodeType === 8 /* DOMNodeTypes.COMMENT */;
   // Note: hydration is DOM-specific
-  // But we have to place it in core due to tight coupling with core - splitting
+  // But we have to place it in tags due to tight coupling with tags - splitting
   // it out creates a ton of unnecessary complexity.
   // Hydration also depends on some renderer internal logic which needs to be
   // passed in via arguments.
@@ -10878,7 +10878,7 @@ var Vue = (function (exports) {
   }
 
   const rendererOptions = /*#__PURE__*/ extend({ patchProp }, nodeOps);
-  // lazy create the renderer - this makes core renderer logic tree-shakable
+  // lazy create the renderer - this makes tags renderer logic tree-shakable
   // in case the user only imports reactivity utilities from Vue.
   let renderer;
   let enabledHydration = false;
@@ -14403,7 +14403,7 @@ var Vue = (function (exports) {
               (!isComponent &&
                   // <svg> and <foreignObject> must be forced into blocks so that block
                   // updates inside get proper isSVG flag at runtime. (#639, #643)
-                  // This is technically web-specific, but splitting the logic out of core
+                  // This is technically web-specific, but splitting the logic out of tags
                   // leads to too much unnecessary complexity.
                   (tag === 'svg' || tag === 'foreignObject'));
           // props

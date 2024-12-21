@@ -14,6 +14,8 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 
+from rest_framework import authentication
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv()
@@ -48,9 +50,11 @@ INSTALLED_APPS = [
     "rest_framework",
     "catalog",
     "product",
-    "core",
+    "tags",
     "basket",
     "order",
+    "userprofile",
+    "authentication",
 ]
 
 MIDDLEWARE = [

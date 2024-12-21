@@ -13,6 +13,8 @@ class Category(models.Model):
         CategoryImage,
         related_name="category",
         on_delete=models.CASCADE,
+        blank=True,
+        null=True,
     )
     parent = models.ForeignKey(
         "self",

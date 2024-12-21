@@ -1,6 +1,24 @@
-from core.serilaizers import TagSerializer
-from product.models import Product, Sale, ProductImage
 from rest_framework import serializers
+
+from tags.serializers import TagSerializer
+from product.models import Product, Sale, ProductImage, Review
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SerializerMethodField(method_name="get_author")
+
+    class Meta:
+        model = Review
+        fields = [
+            "author",
+            "email",
+            "text",
+            "rate",
+            "date",
+        ]
+
+    def get_author(self, obj):
+        return obj.author.username
 
 
 class ProductImageSerializers(serializers.ModelSerializer):
@@ -43,6 +61,41 @@ class ProductShortSerializers(serializers.ModelSerializer):
         if representation.get("rating") is None:
             representation["rating"] = 0.0
         return representation
+
+
+class ProductFullSerializers(serializers.ModelSerializer):
+    images = serializers.SerializerMethodField(method_name="get_product_images")
+    tags = serializers.SerializerMethodField(method_name="get_tags")
+    reviews = serializers.SerializerMethodField(method_name="get_reviews")
+    rating = serializers.FloatField(source="average_rating", read_only=True)
+
+    class Meta:
+        model = Product
+        fields = [
+            "id",
+            "category",
+            "price",
+            "count",
+            "date",
+            "title",
+            "description",
+            "fullDescription",
+            "freeDelivery",
+            "images",
+            "tags",
+            "reviews",
+            "specifications",
+            "rating",
+        ]
+
+    def get_product_images(self, obj):
+        return [image.src.url for image in obj.images.all()]
+
+    def get_tags(self, obj):
+        return [tag.name for tag in obj.tags.all()]
+
+    def get_reviews(self, obj):
+        return [ReviewSerializer(review).data for review in obj.reviews.all()]
 
 
 class SaleSerializers(serializers.ModelSerializer):

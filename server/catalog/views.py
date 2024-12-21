@@ -4,11 +4,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Count, Avg
 
 from product.models import Product, Sale
-from product.serilaizers import ProductShortSerializers, SaleSerializers
+from product.serializers import ProductShortSerializers, SaleSerializers
 from catalog.filters import CatalogFilter
 from catalog.pagination import CustomPagination, SalePagination
 from catalog.models import Category
-from catalog.serilaizers import CategorySerializer
+from catalog.serializers import CategorySerializer
 
 
 class CategoriesApiView(ListAPIView):

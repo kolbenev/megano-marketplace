@@ -1,6 +1,6 @@
 import django_filters
 
-from core.models import Tag
+from tags.models import Tag
 
 
 class CatalogFilter(django_filters.FilterSet):

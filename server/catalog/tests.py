@@ -7,10 +7,10 @@ from rest_framework.test import APIClient
 from rest_framework import status
 
 from product.models import Product, ProductImage, Review, Sale
-from product.serilaizers import ProductShortSerializers
-from core.models import Tag
+from product.serializers import ProductShortSerializers
+from tags.models import Tag
 from catalog.models import Category, CategoryImage
-from catalog.serilaizers import CategorySerializer
+from catalog.serializers import CategorySerializer
 
 
 class TestCategoriesApiView(TestCase):
@@ -19,17 +19,18 @@ class TestCategoriesApiView(TestCase):
     """
 
     def setUp(self):
-        category_image = CategoryImage.objects.create(
-            src="path/to/image.jpg", alt="Category Image"
+
+        self.category_image = CategoryImage.objects.create(
+            src="image.png", alt="Category Image"
         )
         self.category_1 = Category.objects.create(
-            title="Category 1", image=category_image
+            title="Category 1", image=self.category_image
         )
         self.category_2 = Category.objects.create(
-            title="Category 2", image=category_image, parent=self.category_1
+            title="Category 2", image=self.category_image, parent=self.category_1
         )
         self.category_3 = Category.objects.create(
-            title="Category 3", image=category_image, parent=self.category_1
+            title="Category 3", image=self.category_image, parent=self.category_1
         )
         self.client = APIClient()
 
@@ -112,6 +113,9 @@ class TestCatalogListAPIView(TestCase):
         self.product1.tags.add(self.tag1)
         self.product2.tags.add(self.tag2)
         self.product3.tags.add(self.tag1, self.tag2)
+
+    def tearDown(self):
+        pass
 
     def test_get_product_list(self):
         """
