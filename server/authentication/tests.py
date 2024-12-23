@@ -66,7 +66,7 @@ class TestSignIn(TestCase):
             }): ""
         }
         response = self.client.post(self.url, data=data)
-        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_sign_in_invalid_data(self):
         """

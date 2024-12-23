@@ -1,6 +1,7 @@
 import json
 
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -8,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from authentication.serializers import RegistrationSerializer
-from userprofile.models import UserProfile
+from userprofile.models import UserProfile, ProfileAvatar
 
 
 class SignIn(APIView):
@@ -26,7 +27,7 @@ class SignIn(APIView):
 
         user = authenticate(request, username=username, password=password)
         if user is None:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
         login(request, user)
         return Response(status=status.HTTP_200_OK)
@@ -42,12 +43,14 @@ class SignUpView(APIView):
         serializer = RegistrationSerializer(data=data)
 
         if serializer.is_valid():
-            user = serializer.save()
+            user = User.objects.create_user(password=serializer.validated_data["password"], username=serializer.validated_data["username"])
             name = "nameless" if data["name"] is None else data["name"]
-            UserProfile.objects.create(user=user, fullName=name)
+            avatar = ProfileAvatar.objects.create(src=None, alt=None)
+            UserProfile.objects.create(user=user, fullName=name, avatar=avatar)
             user = authenticate(
                 request, username=data["username"], password=data["password"]
             )
+            login(request, user)
             return Response(status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
