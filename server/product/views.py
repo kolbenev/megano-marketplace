@@ -37,4 +37,3 @@ class ProductReviewAPIVIew(APIView):
             product.reviews.add(review)
             return Response(request_serializer.data, status=status.HTTP_200_OK)
         return Response(request_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-

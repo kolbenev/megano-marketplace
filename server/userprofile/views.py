@@ -27,7 +27,9 @@ class ProfileAPIView(APIView):
         """
         permission_classes = [IsAuthenticated]
         user_profile = get_object_or_404(UserProfile, user=request.user)
-        serializer = ProfileUserSerializer(user_profile, data=request.data, partial=True)
+        serializer = ProfileUserSerializer(
+            user_profile, data=request.data, partial=True
+        )
 
         if serializer.is_valid():
             serializer.save()
@@ -44,17 +46,23 @@ class UpdateAvatarView(APIView):
 
     def post(self, request: Request) -> Response:
         user_profile = UserProfile.objects.get(user=request.user)
-        avatar = request.FILES.get('avatar')
+        avatar = request.FILES.get("avatar")
 
         if not avatar:
-            return Response({"error": "Avatar is required."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Avatar is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         if user_profile.avatar:
             user_profile.avatar.src = avatar
-            user_profile.avatar.alt = request.data.get('avatar_alt', user_profile.avatar.alt)
+            user_profile.avatar.alt = request.data.get(
+                "avatar_alt", user_profile.avatar.alt
+            )
             user_profile.avatar.save()
         else:
-            new_avatar = ProfileAvatar.objects.create(src=avatar, alt=request.data.get('avatar_alt', ''))
+            new_avatar = ProfileAvatar.objects.create(
+                src=avatar, alt=request.data.get("avatar_alt", "")
+            )
             user_profile.avatar = new_avatar
             user_profile.save()
 
@@ -73,10 +81,12 @@ class UpdatePasswordView(APIView):
 
     def post(self, request: Request) -> Response:
         user = request.user
-        password = request.data.get('password')
+        password = request.data.get("password")
 
         if not password:
-            return Response({"error": f"Password is required."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": f"Password is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         user.set_password(password)
         user.save()

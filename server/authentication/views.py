@@ -43,7 +43,10 @@ class SignUpView(APIView):
         serializer = RegistrationSerializer(data=data)
 
         if serializer.is_valid():
-            user = User.objects.create_user(password=serializer.validated_data["password"], username=serializer.validated_data["username"])
+            user = User.objects.create_user(
+                password=serializer.validated_data["password"],
+                username=serializer.validated_data["username"],
+            )
             name = "nameless" if data["name"] is None else data["name"]
             avatar = ProfileAvatar.objects.create(src=None, alt=None)
             UserProfile.objects.create(user=user, fullName=name, avatar=avatar)

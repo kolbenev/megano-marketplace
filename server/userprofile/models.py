@@ -12,5 +12,6 @@ class UserProfile(models.Model):
     fullName = models.CharField(max_length=150)
     phone = models.CharField(max_length=15, blank=True, null=True)
     email = models.EmailField()
-    avatar = models.OneToOneField(ProfileAvatar, on_delete=models.CASCADE, null=True, blank=True)
-
+    avatar = models.OneToOneField(
+        ProfileAvatar, on_delete=models.CASCADE, null=True, blank=True
+    )

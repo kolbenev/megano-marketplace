@@ -1,3 +1,7 @@
 from django.urls import path
 
-urlpatterns = []
+from basket.views import BasketGetAPIView
+
+urlpatterns = [
+    path("basket/", BasketGetAPIView.as_view(), name="get-basket"),
+]

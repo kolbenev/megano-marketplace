@@ -11,7 +11,7 @@ from userprofile.models import UserProfile
 class TestSignIn(TestCase):
 
     def setUp(self):
-        self.url = reverse('sign-in')
+        self.url = reverse("sign-in")
         self.username = "testuser"
         self.password = "testpassword123"
         User.objects.create_user(username=self.username, password=self.password)
@@ -21,10 +21,12 @@ class TestSignIn(TestCase):
         Тестирование успешной авторизации.
         """
         data = {
-            json.dumps({
-                "username": self.username,
-                "password": self.password,
-            }): ""
+            json.dumps(
+                {
+                    "username": self.username,
+                    "password": self.password,
+                }
+            ): ""
         }
         response = self.client.post(self.url, data=data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -34,10 +36,12 @@ class TestSignIn(TestCase):
         Тестирование авторизации без указания имени пользователя.
         """
         data = {
-            json.dumps({
-                "username": "",
-                "password": self.password,
-            }): ""
+            json.dumps(
+                {
+                    "username": "",
+                    "password": self.password,
+                }
+            ): ""
         }
         response = self.client.post(self.url, data=data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -47,10 +51,12 @@ class TestSignIn(TestCase):
         Тестирование авторизации без указания пароля.
         """
         data = {
-            json.dumps({
-                "username": self.username,
-                "password": "",
-            }): ""
+            json.dumps(
+                {
+                    "username": self.username,
+                    "password": "",
+                }
+            ): ""
         }
         response = self.client.post(self.url, data=data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -60,10 +66,12 @@ class TestSignIn(TestCase):
         Тестирование авторизации с неверными учетными данными.
         """
         data = {
-            json.dumps({
-                "username": self.username,
-                "password": "wrong-password",
-            }): ""
+            json.dumps(
+                {
+                    "username": self.username,
+                    "password": "wrong-password",
+                }
+            ): ""
         }
         response = self.client.post(self.url, data=data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -73,13 +81,15 @@ class TestSignIn(TestCase):
         Тестирование авторизации с некорректными данными.
         """
         payload = "invalid_payload"
-        response = self.client.post(self.url, data=payload, content_type="application/json")
+        response = self.client.post(
+            self.url, data=payload, content_type="application/json"
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class TestSignOut(TestCase):
     def setUp(self):
-        self.url = reverse('sign-out')
+        self.url = reverse("sign-out")
         self.username = "testuser"
         self.password = "password"
 
@@ -103,16 +113,24 @@ class TestSignOut(TestCase):
 
 class TestSignUpView(TestCase):
     def setUp(self):
-        self.url = reverse('sign-up')
+        self.url = reverse("sign-up")
 
     def test_successful_sign_up(self):
         """
         Тестирование успешной регистрации нового пользователя.
         """
         payload = {
-            json.dumps({"username": "newuser", "password": "newpassword123", "name": "New User"}): ""
+            json.dumps(
+                {
+                    "username": "newuser",
+                    "password": "newpassword123",
+                    "name": "New User",
+                }
+            ): ""
         }
-        response = self.client.post(self.url, data=payload, content_type="application/json")
+        response = self.client.post(
+            self.url, data=payload, content_type="application/json"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(User.objects.filter(username="newuser").exists())
 
@@ -121,9 +139,13 @@ class TestSignUpView(TestCase):
         Тестирование регистрации пользователя без имени.
         """
         payload = {
-            json.dumps({"username": "newuser", "password": "newpassword123", "name": None}): ""
+            json.dumps(
+                {"username": "newuser", "password": "newpassword123", "name": None}
+            ): ""
         }
-        response = self.client.post(self.url, data=payload, content_type="application/json")
+        response = self.client.post(
+            self.url, data=payload, content_type="application/json"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(User.objects.filter(username="newuser").exists())
         user_profile = UserProfile.objects.get(user__username="newuser")
@@ -133,20 +155,20 @@ class TestSignUpView(TestCase):
         """
         Тестирование регистрации пользователя без имени пользователя.
         """
-        payload = {
-            json.dumps({"password": "newpassword123", "name": "New User"}): ""
-        }
-        response = self.client.post(self.url, data=payload, content_type="application/json")
+        payload = {json.dumps({"password": "newpassword123", "name": "New User"}): ""}
+        response = self.client.post(
+            self.url, data=payload, content_type="application/json"
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_sign_up_missing_password(self):
         """
         Тестирование регистрации пользователя без пароля.
         """
-        payload = {
-            json.dumps({"username": "newuser", "name": "New User"}): ""
-        }
-        response = self.client.post(self.url, data=payload, content_type="application/json")
+        payload = {json.dumps({"username": "newuser", "name": "New User"}): ""}
+        response = self.client.post(
+            self.url, data=payload, content_type="application/json"
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_sign_up_invalid_data(self):
@@ -154,5 +176,7 @@ class TestSignUpView(TestCase):
         Тестирование регистрации с некорректными данными.
         """
         payload = "invalid_payload"
-        response = self.client.post(self.url, data=payload, content_type="application/json")
+        response = self.client.post(
+            self.url, data=payload, content_type="application/json"
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
