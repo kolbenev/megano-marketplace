@@ -12,7 +12,7 @@ class ProductImage(models.Model):
 
 
 class Review(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.CharField(max_length=100)
     email = models.EmailField()
     text = models.TextField()
     rate = models.IntegerField()

@@ -6,7 +6,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from product.models import Product
+from product.models import Product, Review
 from product.serializers import ProductFullSerializers, ReviewSerializer
 
 
@@ -25,15 +25,16 @@ class ProductDetailsAPIView(APIView):
 
 class ProductReviewAPIVIew(APIView):
     """
-    Не рабочий.
+    Сделать отзыв на товар.
     """
 
     def post(self, request: Request, id: int) -> Response:
-        permission_classes = (IsAuthenticated,)
+        permission_classes = [IsAuthenticated]
         product = get_object_or_404(Product, id=id)
         request_serializer = ReviewSerializer(data=request.data)
         if request_serializer.is_valid():
-            request_serializer.save()
-            product.reviews.add(request_serializer)
-            return Response(request_serializer.data, status.HTTP_200_OK)
-        return Response(request_serializer.errors, status.HTTP_400_BAD_REQUEST)
+            review = request_serializer.save()
+            product.reviews.add(review)
+            return Response(request_serializer.data, status=status.HTTP_200_OK)
+        return Response(request_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

@@ -5,7 +5,6 @@ from product.models import Product, Sale, ProductImage, Review
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    author = serializers.SerializerMethodField(method_name="get_author")
 
     class Meta:
         model = Review
@@ -14,11 +13,7 @@ class ReviewSerializer(serializers.ModelSerializer):
             "email",
             "text",
             "rate",
-            "date",
         ]
-
-    def get_author(self, obj):
-        return obj.author.username
 
 
 class ProductImageSerializers(serializers.ModelSerializer):

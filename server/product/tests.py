@@ -2,7 +2,6 @@ from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
-from rest_framework.test import APIClient
 from rest_framework import status
 
 from catalog.models import CategoryImage
@@ -11,8 +10,6 @@ from product.models import Product, Category, ProductImage, Tag, Review
 
 class ProductDetailsAPITest(TestCase):
     def setUp(self):
-        self.client = APIClient()
-
         category_image_content = ContentFile(
             b"fake_image_content", "category_image.jpg"
         )
@@ -93,3 +90,77 @@ class ProductDetailsAPITest(TestCase):
         url = reverse("product-details", args=[999])
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class ProductReviewAPITest(TestCase):
+    def setUp(self):
+        category_image_content = ContentFile(
+            b"fake_image_content", "category_image.jpg"
+        )
+        self.category_image = CategoryImage.objects.create(
+            src=category_image_content, alt="Category Image"
+        )
+        self.category = Category.objects.create(
+            title="Electronics", image=self.category_image
+        )
+
+        self.product = Product.objects.create(
+            category=self.category,
+            price=500.67,
+            count=12,
+            title="Video Card",
+            description="Description of the product",
+            fullDescription="Full description of the product",
+            freeDelivery=True,
+        )
+        self.valid_payload = {
+            "author": "Test Author",
+            "email": "author@example.com",
+            "text": "This is a test review.",
+            "rate": 5,
+        }
+        self.invalid_payload = {
+            "author": "",
+            "email": "not-an-email",
+            "text": "",
+            "rate": 10,
+        }
+
+    def tearDown(self):
+        self.category_image.src.delete(save=False)
+
+    def test_create_review_valid_payload(self):
+        """
+        Тестирование успешного создания отзыва с валидными данными.
+        """
+        url = reverse("product-review", args=[self.product.id])
+        response = self.client.post(url, data=self.valid_payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Review.objects.count(), 1)
+        review = Review.objects.first()
+        self.assertEqual(review.author, self.valid_payload["author"])
+        self.assertEqual(review.email, self.valid_payload["email"])
+        self.assertEqual(review.text, self.valid_payload["text"])
+        self.assertEqual(review.rate, self.valid_payload["rate"])
+        self.assertIn(review, self.product.reviews.all())
+
+    def test_create_review_invalid_payload(self):
+        """
+        Тестирование ошибки при создании отзыва с невалидными данными.
+        """
+        url = reverse("product-review", args=[self.product.id])
+        response = self.client.post(url, data=self.invalid_payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Review.objects.count(), 0)
+
+    def test_create_review_for_nonexistent_product(self):
+        """
+        Тестирование ошибки при создании отзыва для несуществующего товара.
+        """
+        url = reverse("product-review", args=[999])
+        response = self.client.post(url, data=self.valid_payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(Review.objects.count(), 0)
