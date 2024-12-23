@@ -21,7 +21,7 @@ class SignIn(APIView):
         username = user_data.get("username")
         password = user_data.get("password")
 
-        if username is None or password is None:
+        if username == "" or password == "":
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         user = authenticate(request, username=username, password=password)

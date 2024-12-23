@@ -7,7 +7,7 @@ from authentication.views import (
 )
 
 urlpatterns = [
-    path("sign-in/", SignIn.as_view(), name="signin"),
-    path("sign-up/", SignUpView.as_view(), name="signup"),
-    path("sign-out/", SignOutView.as_view(), name="signout"),
+    path("sign-in/", SignIn.as_view(), name="sign-in"),
+    path("sign-up/", SignUpView.as_view(), name="sign-up"),
+    path("sign-out/", SignOutView.as_view(), name="sign-out"),
 ]
