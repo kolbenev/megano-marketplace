@@ -1,11 +1,11 @@
-from django.core.files.base import ContentFile
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
+from django.core.files.base import ContentFile
 
-from catalog.models import CategoryImage, Category
 from order.models import Order
 from product.models import ProductImage, Product
+from catalog.models import CategoryImage, Category
 
 
 class TestOrdersApiView(APITestCase):

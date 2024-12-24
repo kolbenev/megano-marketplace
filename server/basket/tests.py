@@ -3,24 +3,32 @@ from django.test import TestCase
 from rest_framework import status
 from django.contrib.auth.models import User
 
-from basket.models import Basket, BasketItem
-from catalog.models import Category
 from product.models import Product
+from catalog.models import Category
+from basket.models import Basket, BasketItem
 
 
 class BasketViewTests(TestCase):
     def setUp(self):
-        self.category = Category.objects.create(title='category')
+        self.category = Category.objects.create(title="category")
         self.username = "testuser"
         self.password = "password"
         self.user = User.objects.create_user(
             username=self.username, password=self.password
         )
         self.product1 = Product.objects.create(
-            id=1, title="Product 1", price=100.0, category=self.category, description="Test product 1"
+            id=1,
+            title="Product 1",
+            price=100.0,
+            category=self.category,
+            description="Test product 1",
         )
         self.product2 = Product.objects.create(
-            id=2, title="Product 2", price=200.0, category=self.category, description="Test product 2"
+            id=2,
+            title="Product 2",
+            price=200.0,
+            category=self.category,
+            description="Test product 2",
         )
         self.basket = Basket.objects.create(user=self.user)
         self.client.login(username=self.username, password=self.password)
@@ -71,14 +79,18 @@ class BasketViewTests(TestCase):
         BasketItem.objects.create(basket=self.basket, product=self.product1, quantity=5)
 
         data = {"id": self.product1.id, "count": 3}
-        response = self.client.delete(self.basket_url, data, content_type="application/json")
+        response = self.client.delete(
+            self.basket_url, data, content_type="application/json"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         basket_item = BasketItem.objects.get(basket=self.basket, product=self.product1)
         self.assertEqual(basket_item.quantity, 2)
 
         data = {"id": self.product1.id, "count": 2}
-        response = self.client.delete(self.basket_url, data, content_type="application/json")
+        response = self.client.delete(
+            self.basket_url, data, content_type="application/json"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         with self.assertRaises(BasketItem.DoesNotExist):
@@ -89,6 +101,8 @@ class BasketViewTests(TestCase):
         Тест удаления несуществующего товара из корзины.
         """
         data = {"id": 999, "count": 1}
-        response = self.client.delete(self.basket_url, data, content_type="application/json")
+        response = self.client.delete(
+            self.basket_url, data, content_type="application/json"
+        )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data["error"], "Item not found in basket.")

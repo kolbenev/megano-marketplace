@@ -1,16 +1,16 @@
-from django.contrib.auth.models import User
-from django.core.files.base import ContentFile
-from django.db.models import Count
-from django.test import TestCase
 from django.urls import reverse
-from rest_framework.test import APIClient
+from django.test import TestCase
 from rest_framework import status
+from django.db.models import Count
+from rest_framework.test import APIClient
+from django.core.files.base import ContentFile
+from django.contrib.auth.models import User
 
-from product.models import Product, ProductImage, Review, Sale
-from product.serializers import ProductShortSerializers
 from tags.models import Tag
-from catalog.models import Category, CategoryImage
 from catalog.serializers import CategorySerializer
+from catalog.models import Category, CategoryImage
+from product.serializers import ProductShortSerializers
+from product.models import Product, ProductImage, Review, Sale
 
 
 class TestCategoriesApiView(TestCase):

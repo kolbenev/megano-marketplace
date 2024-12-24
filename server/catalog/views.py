@@ -1,14 +1,14 @@
-from rest_framework.generics import ListAPIView, RetrieveAPIView
+from django.db.models import Count, Avg
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Count, Avg
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 
-from product.models import Product, Sale
-from product.serializers import ProductShortSerializers, SaleSerializers
-from catalog.filters import CatalogFilter
-from catalog.pagination import CustomPagination, SalePagination
 from catalog.models import Category
+from product.models import Product, Sale
+from catalog.filters import CatalogFilter
 from catalog.serializers import CategorySerializer
+from catalog.pagination import CustomPagination, SalePagination
+from product.serializers import ProductShortSerializers, SaleSerializers
 
 
 class CategoriesApiView(ListAPIView):

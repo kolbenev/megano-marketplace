@@ -2,8 +2,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from product.models import Product
 
+
 class Basket(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name="basket")
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, null=True, blank=True, related_name="basket"
+    )
     session_key = models.CharField(max_length=255, null=True, blank=True, unique=True)
     items = models.ManyToManyField(Product, through="BasketItem")
 
@@ -12,8 +15,11 @@ class Basket(models.Model):
             return f"Basket of {self.user.username}"
         return f"Basket for session {self.session_key}"
 
+
 class BasketItem(models.Model):
-    basket = models.ForeignKey(Basket, on_delete=models.CASCADE, related_name="basket_items")
+    basket = models.ForeignKey(
+        Basket, on_delete=models.CASCADE, related_name="basket_items"
+    )
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
 

@@ -1,7 +1,5 @@
 from django.contrib import admin
-
-from django.contrib import admin
-from .models import ProductImage, Review, Product, Sale
+from product.models import ProductImage, Review, Product, Sale
 
 
 @admin.register(ProductImage)

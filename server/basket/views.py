@@ -31,7 +31,9 @@ class BasketView(APIView):
         basket = self.get_basket(request)
         basket_items = {item.product.id: item for item in basket.basket_items.all()}
         products = [item.product for item in basket.basket_items.all()]
-        serializer = ProductInBasketSerializer(products, many=True, context={"basket_items": basket_items})
+        serializer = ProductInBasketSerializer(
+            products, many=True, context={"basket_items": basket_items}
+        )
         return Response(serializer.data, status=200)
 
     def post(self, request):
@@ -45,9 +47,13 @@ class BasketView(APIView):
         try:
             product = Product.objects.get(id=product_id)
         except Product.DoesNotExist:
-            return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND
+            )
 
-        basket_item, created = BasketItem.objects.get_or_create(basket=basket, product=product)
+        basket_item, created = BasketItem.objects.get_or_create(
+            basket=basket, product=product
+        )
         if not created:
             basket_item.quantity += int(count)
         else:
@@ -65,19 +71,28 @@ class BasketView(APIView):
         count = data.get("count", 1)
 
         if not product_id:
-            return Response({"error": "Product ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Product ID is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         basket = self.get_basket(request)
 
         try:
             basket_item = BasketItem.objects.get(basket=basket, product_id=product_id)
         except BasketItem.DoesNotExist:
-            return Response({"error": "Item not found in basket."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Item not found in basket."}, status=status.HTTP_404_NOT_FOUND
+            )
 
         if basket_item.quantity > count:
             basket_item.quantity -= count
             basket_item.save()
-            return Response({"message": f"{count} item(s) removed from basket."}, status=status.HTTP_200_OK)
+            return Response(
+                {"message": f"{count} item(s) removed from basket."},
+                status=status.HTTP_200_OK,
+            )
         else:
             basket_item.delete()
-            return Response({"message": "Item removed from basket."}, status=status.HTTP_200_OK)
+            return Response(
+                {"message": "Item removed from basket."}, status=status.HTTP_200_OK
+            )

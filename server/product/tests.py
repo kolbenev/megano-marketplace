@@ -1,8 +1,8 @@
-from django.core.files.base import ContentFile
-from django.contrib.auth.models import User
-from django.test import TestCase
 from django.urls import reverse
+from django.test import TestCase
 from rest_framework import status
+from django.contrib.auth.models import User
+from django.core.files.base import ContentFile
 
 from catalog.models import CategoryImage
 from product.models import Product, Category, ProductImage, Tag, Review
@@ -72,8 +72,8 @@ class ProductDetailsAPITest(TestCase):
         self.assertEqual(data["fullDescription"], self.product.fullDescription)
         self.assertEqual(data["freeDelivery"], self.product.freeDelivery)
         self.assertEqual(len(data["images"]), 2)
-        self.assertIn(self.image1.src.url, data["images"])
-        self.assertIn(self.image2.src.url, data["images"])
+        self.assertIn(self.image1.src.url, data["images"][0]["src"])
+        self.assertIn(self.image2.src.url, data["images"][1]["src"])
         self.assertEqual(len(data["tags"]), 2)
         self.assertIn(self.tag1.name, data["tags"])
         self.assertIn(self.tag2.name, data["tags"])

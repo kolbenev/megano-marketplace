@@ -1,8 +1,8 @@
 from rest_framework import status
-from rest_framework.generics import get_object_or_404
+from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.generics import get_object_or_404
 
 from order.models import Order
 from order.serializers import OrderSerializer
