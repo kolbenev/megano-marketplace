@@ -84,7 +84,7 @@ class ProductFullSerializers(serializers.ModelSerializer):
         ]
 
     def get_product_images(self, obj):
-        return [image.src.url for image in obj.images.all()]
+        return [ProductImageSerializers(image).data for image in obj.images.all()]
 
     def get_tags(self, obj):
         return [tag.name for tag in obj.tags.all()]

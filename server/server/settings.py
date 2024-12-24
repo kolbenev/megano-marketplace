@@ -151,3 +151,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
 }
+
+MEDIA_URL = 'http://127.0.0.1/'
+MEDIA_ROOT = ''
