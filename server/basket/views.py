@@ -49,9 +49,9 @@ class BasketView(APIView):
 
         basket_item, created = BasketItem.objects.get_or_create(basket=basket, product=product)
         if not created:
-            basket_item.quantity += count
+            basket_item.quantity += int(count)
         else:
-            basket_item.quantity = count
+            basket_item.quantity = int(count)
         basket_item.save()
 
         return Response({"message": "Item added to basket."}, status=status.HTTP_200_OK)
